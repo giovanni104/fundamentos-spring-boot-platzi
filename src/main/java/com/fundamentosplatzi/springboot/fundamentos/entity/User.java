@@ -1,6 +1,6 @@
 package com.fundamentosplatzi.springboot.fundamentos.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -8,26 +8,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "post")
+@Table(name = "users")
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id_user", nullable = false, unique = true)
     private Long id;
-
-    @Column(  length = 50)
+    @Column(length = 50)
     private String name;
-    @Column(  length = 50)
+    @Column(length = 50, nullable = false, unique = true)
     private String email;
+    @Column(name = "birth_date")
     private LocalDate birthDate;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonIgnore
+    private List<Post> post = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    @JsonManagedReference
-    private List<Post> posts=new ArrayList<>();
-
-
-    public User() { }
+    public User() {
+    }
 
     public User(String name, String email, LocalDate birthDate) {
         this.name = name;
@@ -68,13 +66,8 @@ public class User {
     }
 
     public List<Post> getPosts() {
-        return posts;
+        return post;
     }
-
-    public void setPosts(List<Post> posts) {
-        this.posts = posts;
-    }
-
 
     @Override
     public String toString() {
@@ -83,7 +76,6 @@ public class User {
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", birthDate=" + birthDate +
-                ", posts=" + posts +
                 '}';
     }
 }
